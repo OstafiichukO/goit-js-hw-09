@@ -7,17 +7,6 @@ const hoursEl = document.querySelector('[data-hours]');
 const minutesEl = document.querySelector('[data-minutes]');
 const secondsEl = document.querySelector('[data-seconds]');
 
-const options = {
-  enableTime: true,
-  time_24hr: true,
-  defaultDate: new Date(),
-  minuteIncrement: 1,
-  onClose(selectedDates) {
-    console.log(selectedDates[0]);
-  },
-};
-flatpickr('#datetime-picker', options);
-
 let currentDate = new Date();
 let selectedDate = new Date();
 let timeLeft = 0;
@@ -25,6 +14,29 @@ let timerId = null;
 
 startBtn.setAttribute('disabled', 'true');
 
+const options = {
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    // timeLeft = selectedDates[0].getTime();
+    selectedDate = selectedDates[0];
+    if (selectedDate.getTime() < currentDate.getTime()) {
+      startBtn.setAttribute('disabled', true);
+      window.alert('Please choose a date in the future');
+    } else {
+      startBtn.removeAttribute('disabled');
+      timeLeft = selectedDate.getTime() - currentDate.getTime();
+      return timeLeft;
+    }
+  },
+};
+flatpickr('#datetime-picker', options);
+
+function addLeadingZero(value) {
+  return String(value).padStart(2, '0');
+}
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
@@ -35,10 +47,6 @@ function convertMs(ms) {
   const minutes = Math.floor(((ms % day) % hour) / minute);
   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
   return { days, hours, minutes, seconds };
-}
-
-function addLeadingZero(value) {
-  return String(value).padStart(2, '0');
 }
 
 const timer = () => {

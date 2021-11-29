@@ -18,6 +18,13 @@ const options = {
 };
 flatpickr('#datetime-picker', options);
 
+let currentDate = new Date();
+let selectedDate = new Date();
+let timeLeft = 0;
+let timerId = null;
+
+startBtn.setAttribute('disabled', 'true');
+
 function convertMs(ms) {
   const second = 1000;
   const minute = second * 60;
@@ -33,3 +40,26 @@ function convertMs(ms) {
 function addLeadingZero(value) {
   return String(value).padStart(2, '0');
 }
+
+const timer = () => {
+  const endTime = convertMs(timeLeft);
+  daysEl.textContent = addLeadingZero(endTime.days);
+  hoursEl.textContent = addLeadingZero(endTime.hours);
+  minutesEl.textContent = addLeadingZero(endTime.minutes);
+  secondsEl.textContent = addLeadingZero(endTime.seconds);
+};
+const interval = () => {
+  timerId = setInterval(() => {
+    if (timeLeft >= 1000) {
+      currentDate = new Date();
+      timeLeft = selectedDate.getTime() - currentDate.getTime();
+      timer();
+      return timeLeft;
+    } else {
+      clearInterval(timerId);
+      startBtn.removeEventListener('click', interval);
+    }
+  }, 1000);
+};
+
+startBtn.addEventListener('click', interval);
